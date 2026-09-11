@@ -149,7 +149,7 @@ export function createSoccerBall(): THREE.Group {
   const bumpTexture = new THREE.CanvasTexture(bumpCanvas)
   bumpTexture.wrapS = THREE.RepeatWrapping
 
-  const ballGeo = new THREE.SphereGeometry(0.7, 48, 48)
+  const ballGeo = new THREE.SphereGeometry(0.7, 32, 32)
   const ballMat = new THREE.MeshStandardMaterial({
     map: texture,
     bumpMap: bumpTexture,

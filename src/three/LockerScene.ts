@@ -10,6 +10,11 @@ export interface LockerSceneCallbacks {
   onAllPlaced?: () => void
 }
 
+const isMobileDevice = (): boolean => {
+  if (typeof window === 'undefined') return false
+  return window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 768
+}
+
 /**
  * Master controller for the 3D Locker Room Experience.
  * Encapsulates Three.js rendering, lighting, camera parallax,
@@ -25,6 +30,8 @@ export class LockerScene {
   private animationFrameId: number | null = null
   private clock: THREE.Clock = new THREE.Clock()
   private callbacks: LockerSceneCallbacks
+  private isMobile: boolean = false
+  private frameCounter: number = 0
 
   // Meshes
   public soccerBall: THREE.Group
@@ -49,6 +56,7 @@ export class LockerScene {
   constructor(container: HTMLElement, callbacks: LockerSceneCallbacks = {}) {
     this.container = container
     this.callbacks = callbacks
+    this.isMobile = isMobileDevice()
 
     // 1. Scene setup
     this.scene = new THREE.Scene()
@@ -60,12 +68,16 @@ export class LockerScene {
     this.camera.position.copy(this.currentCameraPos)
     this.camera.lookAt(this.lookAtTarget)
 
-    // 3. Renderer setup
-    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' })
+    // 3. Renderer setup (quality scales down on mobile GPUs)
+    this.renderer = new THREE.WebGLRenderer({
+      antialias: true,
+      alpha: false,
+      powerPreference: this.isMobile ? 'default' : 'high-performance',
+    })
     this.renderer.setSize(container.clientWidth, container.clientHeight)
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, this.isMobile ? 1.5 : 2))
     this.renderer.shadowMap.enabled = true
-    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap
+    this.renderer.shadowMap.type = this.isMobile ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping
     this.renderer.toneMappingExposure = 1.15
     this.renderer.outputColorSpace = THREE.SRGBColorSpace
@@ -75,13 +87,13 @@ export class LockerScene {
     this.physics = new WormsPhysicsSystem(this.scene)
 
     // 5. Environment & Locker
-    const env = createLockerEnvironment()
+    const env = createLockerEnvironment({ lowQuality: this.isMobile })
     this.scene.add(env.group)
 
     // 6. 3D Models
     this.soccerBall = createSoccerBall()
     this.jordanShoe = createJordanShoe()
-    this.heartWhistle = createHeartWhistle()
+    this.heartWhistle = createHeartWhistle({ lowQuality: this.isMobile })
 
     this.scene.add(this.soccerBall)
     this.scene.add(this.jordanShoe)
@@ -260,6 +272,12 @@ export class LockerScene {
 
     // Update Worms 3D physics & particles
     this.physics.update(delta, elapsed)
+
+    // Idle throttling: render at ~20fps when camera and physics are settled
+    const cameraSettled = this.currentCameraPos.distanceToSquared(this.targetCameraPos) < 0.0001
+    const idle = cameraSettled && !this.physics.isBusy()
+    this.frameCounter++
+    if (idle && this.frameCounter % 3 !== 0) return
 
     // Render frame
     this.renderer.render(this.scene, this.camera)

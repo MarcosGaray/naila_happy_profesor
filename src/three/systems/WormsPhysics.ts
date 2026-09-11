@@ -63,6 +63,19 @@ export class WormsPhysicsSystem {
   }
 
   /**
+   * True while any ballistic flight, squash landing or particle burst is active.
+   * Used by the renderer to throttle frames when the scene is settled.
+   */
+  public isBusy(): boolean {
+    if (this.particles.length > 0) return true
+    for (const item of this.items.values()) {
+      if (item.flying) return true
+      if (item.squashTime >= 0 && item.squashTime < 1.2) return true
+    }
+    return false
+  }
+
+  /**
    * Triggers the Worms 3D ballistic leap into the locker.
    */
   launchItem(id: 'football' | 'sneaker' | 'whistle') {

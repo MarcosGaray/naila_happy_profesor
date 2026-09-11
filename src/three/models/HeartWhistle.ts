@@ -8,9 +8,10 @@ import * as THREE from 'three'
  * - Physical education lanyard (cordón trenzado) hanging gracefully
  * - Utilizes MeshPhysicalMaterial with transmission and optical refraction
  */
-export function createHeartWhistle(): THREE.Group {
+export function createHeartWhistle(options: { lowQuality?: boolean } = {}): THREE.Group {
   const group = new THREE.Group()
   group.name = 'heart-whistle'
+  const lowQuality = options.lowQuality ?? false
 
   // ─── MATERIALS ───
   // Ruby Red Glass Material (Gem-like refraction, smooth specular shine)
@@ -29,6 +30,14 @@ export function createHeartWhistle(): THREE.Group {
     clearcoatRoughness: 0.05,
     transparent: true,
   })
+
+  // Mobile GPUs cannot afford the full-scene transmission pass; fake the
+  // glassy look with opacity + clearcoat instead (visually near-identical)
+  if (lowQuality) {
+    rubyGlassMat.transmission = 0
+    rubyGlassMat.opacity = 0.88
+    rubyGlassMat.roughness = 0.1
+  }
 
   // Polished silver chrome for mouthpiece tip and hanging ring
   const chromeMat = new THREE.MeshStandardMaterial({

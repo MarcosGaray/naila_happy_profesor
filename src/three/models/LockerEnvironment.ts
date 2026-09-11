@@ -10,7 +10,7 @@ import * as THREE from 'three'
  *   * Hockey field with turf, goals, and orange training cones
  *   * Cheerful school/club campus atmosphere with warm sunlight
  */
-export function createLockerEnvironment(): {
+export function createLockerEnvironment(options: { lowQuality?: boolean } = {}): {
   group: THREE.Group
   targetPositions: {
     football: THREE.Vector3
@@ -25,6 +25,7 @@ export function createLockerEnvironment(): {
 } {
   const envGroup = new THREE.Group()
   envGroup.name = 'locker-environment'
+  const lowQuality = options.lowQuality ?? false
 
   // ─── MATERIALS ───
   // Oak / Birch wood for locker furniture
@@ -445,9 +446,10 @@ export function createLockerEnvironment(): {
   const sunLight = new THREE.DirectionalLight(0xfff5ea, 1.6)
   sunLight.position.set(5, 7, 3)
   sunLight.castShadow = true
-  sunLight.shadow.mapSize.width = 2048
-  sunLight.shadow.mapSize.height = 2048
+  sunLight.shadow.mapSize.width = lowQuality ? 1024 : 2048
+  sunLight.shadow.mapSize.height = lowQuality ? 1024 : 2048
   sunLight.shadow.bias = -0.0005
+  sunLight.shadow.radius = 3
   sunLight.shadow.camera.near = 1
   sunLight.shadow.camera.far = 20
   sunLight.shadow.camera.left = -6
@@ -470,7 +472,8 @@ export function createLockerEnvironment(): {
     const spot = new THREE.SpotLight(0xffedd5, 1.2, 8, Math.PI / 6, 0.4, 1.5)
     spot.position.set(x, 1.6, -0.8)
     spot.target.position.set(x, 0, -1.6)
-    spot.castShadow = true
+    // On mobile the 3 shadow-casting spots cost 3 extra shadow passes/frame
+    spot.castShadow = !lowQuality
     lockerGroup.add(spot.target)
     lockerGroup.add(spot)
     return spot
