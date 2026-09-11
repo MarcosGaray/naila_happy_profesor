@@ -143,7 +143,7 @@ export default function LockerRoom({
         </div>
 
         {/* Finished State Action or Exploration hint */}
-        {allPlaced ? (
+        {allPlaced && (
           <motion.button
             initial={{ opacity: 0, y: 4 }}
             animate={{ opacity: 1, y: 0 }}
@@ -154,10 +154,6 @@ export default function LockerRoom({
             <span>🔄</span>
             <span>Reiniciar vestuario</span>
           </motion.button>
-        ) : (
-          <p className="mt-2 text-[10px] sm:text-[11px] font-semibold text-slate-400 tracking-wide text-center">
-            Deslizá la pantalla para explorar el vestuario y la cancha ⚽🏒
-          </p>
         )}
       </div>
     </div>

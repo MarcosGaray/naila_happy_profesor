@@ -16,7 +16,7 @@ export const ITEMS: ItemConfig[] = [
   },
   {
     id: 'sneaker',
-    label: 'Zapa Urbana',
+    label: 'Unas Nike',
     emoji: '👟',
     badgeColor: 'bg-emerald-100 border-emerald-300 text-emerald-700',
     word: 'ENERGÍA',

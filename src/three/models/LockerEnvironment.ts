@@ -232,7 +232,7 @@ export function createLockerEnvironment(): {
   }
 
   createBayTag(-bayWidth, '⚽ FÚTBOL')
-  createBayTag(0, '👟 ZAPA URBANA')
+  createBayTag(0, '👟 UNAS NIKE')
   createBayTag(bayWidth, '💖 SILBATO')
 
   // ─── 7. COACH TACTICAL WHITEBOARD ON LEFT WALL ───

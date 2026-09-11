@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Confetti from './Confetti'
+import photoNaila1 from '../images/naila_1.jpg'
+import photoNaila2 from '../images/naila_2.jpg'
 
 interface ClimaxModalProps {
   onReset: () => void
@@ -62,7 +64,7 @@ export default function ClimaxModal({ onReset }: ClimaxModalProps) {
             >
               {!photo1Error ? (
                 <img
-                  src="/foto-naila-1.jpg"
+                  src={photoNaila1}
                   alt="Naila Sonriendo"
                   className="w-full h-full object-cover rounded"
                   onError={() => setPhoto1Error(true)}
@@ -83,7 +85,7 @@ export default function ClimaxModal({ onReset }: ClimaxModalProps) {
             >
               {!photo2Error ? (
                 <img
-                  src="/foto-naila-2.jpg"
+                  src={photoNaila2}
                   alt="Naila Deporte"
                   className="w-full h-full object-cover rounded"
                   onError={() => setPhoto2Error(true)}
